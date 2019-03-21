@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Soliel/SpellBot/command"
+	"github.com/soliel/SpellBot/command"
 	"github.com/bwmarrin/discordgo"
 	"strings"
 )

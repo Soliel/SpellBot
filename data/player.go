@@ -1,5 +1,9 @@
 package data
 
+import(
+	"database/sql"
+)
+
 //Player is a container for all player information.
 type Player struct {
 	PlayerID              string //Effectively the Discord User ID.
@@ -32,6 +36,9 @@ func GetPlayerByID(playerID string) (Player, error) {
 		&player.MageRank,
 		&player.MageExperience,
 	)
+	if err == sql.ErrNoRows {
+		return Player{}, nil
+	}
 	if err != nil {
 		return Player{}, err
 	}

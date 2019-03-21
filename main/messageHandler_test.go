@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/Soliel/SpellBot/config"
+	"github.com/soliel/SpellBot/config"
 	"reflect"
 	"testing"
 
-	"github.com/Soliel/SpellBot/command"
+	"github.com/soliel/SpellBot/command"
 	"github.com/bwmarrin/discordgo"
 )
 

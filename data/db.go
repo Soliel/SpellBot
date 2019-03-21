@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/soliel/SpellBot/config"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql" //Driver connection
 )
@@ -21,4 +22,8 @@ func InitDB(loginString string) error {
 
 	db = database
 	return nil
+}
+
+func CreateDatabaseString(conf config.Config) string {
+	return conf.DatabaseUser + ":" + conf.DatabasePass + "@tcp(" + conf.DatabaseIP + ":" + conf.DatabasePort + ")"
 }

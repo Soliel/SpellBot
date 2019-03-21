@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/Soliel/SpellBot/command"
-	"github.com/Soliel/SpellBot/config"
-	"github.com/Soliel/SpellBot/data"
+	"github.com/soliel/SpellBot/command"
+	"github.com/soliel/SpellBot/config"
+	"github.com/soliel/SpellBot/data"
 	"log"
 	"os"
 	"os/signal"
@@ -32,7 +32,7 @@ func main() {
 		return
 	}
 
-	err = data.InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	err = data.InitDB(data.CreateDatabaseString(*conf) + "/SpellBot")
 	if err != nil {
 		log.Panic("Unable to connect to the database: ", err)
 	}
