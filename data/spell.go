@@ -62,7 +62,7 @@ func InsertNewSpell(spell Spell) error {
 	}
 	defer tx.Rollback()
 
-	err = tx.QueryRow("SELECT SpellID FROM SpellTable WHERE PlayerID = ? AND SpellName = ?").Scan(nil)
+	err = tx.QueryRow("SELECT SpellID, SpellName, PlayerID FROM SpellTable WHERE PlayerID = \""+spell.PlayerID+"\" AND SpellName = \""+spell.Name+"\"").Scan(nil, nil, nil)
 	if err == nil {
 		return errors.New("spell already exists")
 	} else if err != sql.ErrNoRows {
@@ -153,5 +153,22 @@ func UpdateSpell(spell Spell) error {
 		return err
 	}
 	tx.Commit()
+	return nil
+}
+
+//RemoveSpellByNameAndPlayerID is used for testing and potentially for admin duties.
+func RemoveSpellByNameAndPlayerID(name string, playerID string) error {
+	stmt, err := db.Prepare("DELETE FROM SpellTable WHERE SpellName = ? AND PlayerID = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(name, playerID)
+	if err != nil {
+		return err
+	}
+
+	stmt.Close()
+
 	return nil
 }

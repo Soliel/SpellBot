@@ -41,7 +41,14 @@ func GetPlayerByID(playerID string) (Player, error) {
 
 //InsertNewPlayer update the database with a new player.
 func InsertNewPlayer(playerID string) error {
-	stmt, err := db.Prepare("INSERT INTO PlayerTable(PlayerID) VALUES(?)")
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	//oh look a comment
+	stmt, err := tx.Prepare("INSERT INTO PlayerTable(PlayerID) VALUES(?)")
 	if err != nil {
 		return err
 	}
@@ -53,10 +60,14 @@ func InsertNewPlayer(playerID string) error {
 		return err
 	}
 
+	tx.Commit()
+	stmt.Close()
 	return nil
 }
 
-//UpdatePlayer will overwrite a Player in the database with the values from the struct.
+/*UpdatePlayer will overwrite a Player in the database with the values from the struct.
+ *This is best used after you've gotten a player struct from GetPlayerByID
+ */
 func UpdatePlayer(player Player) error {
 	tx, err := db.Begin()
 	if err != nil {
@@ -102,5 +113,30 @@ func UpdatePlayer(player Player) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+//RemovePlayer will scrub a player's stats and existing spells from the database.
+func RemovePlayer(playerID string) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare("DELETE FROM PlayerTable WHERE PlayerID = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(playerID)
+	if err != nil {
+		return err
+	}
+
+	stmt.Close()
+	tx.Commit()
+
 	return nil
 }

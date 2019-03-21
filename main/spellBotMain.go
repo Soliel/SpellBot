@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/Soliel/SpellBot/command"
 	"github.com/Soliel/SpellBot/config"
+	"github.com/Soliel/SpellBot/data"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,16 +19,22 @@ var (
 )
 
 func main() {
-	conf, err := config.LoadConfig("SpellBotConfig.json")
+	config, err := config.LoadConfig("SpellBotConfig.json")
 	if err != nil {
 		fmt.Println("Error loading configuration, ", err)
 		return
 	}
+	conf = config
 
 	dg, err := discordgo.New("Bot " + conf.BotToken)
 	if err != nil {
 		fmt.Println("Error starting discord session, ", err)
 		return
+	}
+
+	err = data.InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	if err != nil {
+		log.Panic("Unable to connect to the database: ", err)
 	}
 
 	dg.AddHandler(onMessageRecieved)
@@ -39,6 +47,10 @@ func main() {
 
 	handler = command.CreateHandler()
 
+	for i, guild := range dg.State.Guilds {
+		fmt.Print(guild.Name, ", ", guild.ID, ", ", i, "\n")
+	}
+
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
@@ -48,6 +60,7 @@ func main() {
 }
 
 func onMessageRecieved(s *discordgo.Session, m *discordgo.MessageCreate) {
+	fmt.Printf("Msg: %v | Author: %v\n", m.Content, m.Author)
 	command := filterMessages(s, m)
 	if command.Command == "" {
 		return

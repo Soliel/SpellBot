@@ -3,21 +3,22 @@ package data
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql" //Driver connection
-	"log"
 )
 
 var db *sql.DB
 
 //InitDB should be used with connection string in the format of user:password@tcp(127.0.0.1:3306)/hello
-func InitDB(loginString string) {
-	db, err := sql.Open("mysql", loginString)
+func InitDB(loginString string) error {
+	database, err := sql.Open("mysql", loginString)
 	if err != nil {
-		log.Fatal(err)
-		return
+		return err
 	}
 
-	err = db.Ping()
+	err = database.Ping()
 	if err != nil {
-		log.Fatal("Unable to connect to database, ", err)
+		return err
 	}
+
+	db = database
+	return nil
 }
