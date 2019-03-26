@@ -1,18 +1,27 @@
 package spellforge
 
 import (
+	"log"
+	"strings"
+
 	"github.com/soliel/SpellBot/command"
 	"github.com/soliel/SpellBot/data"
-	"log"
 )
 
+var spellAmount struct {
+}
+
+//CreateSpell is the command users will use to forge a new spell
 func CreateSpell(ctx command.Context) {
+	strings.Split
+
 	player, err := data.GetPlayerByID(ctx.Author.ID)
 	if err != nil {
 		log.Printf("Create spell could not execute due to: %v", err)
 	}
 
-	if player == data.Player{} {
+	if player == (data.Player{}) {
 		data.InsertNewPlayer(ctx.Author.ID)
 	}
+
 }
