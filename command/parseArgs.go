@@ -6,7 +6,7 @@ import (
 )
 
 //SeperateArgs will seperate strings
-func SeperateArgs(argString string, validFlags ...interface{}) (*map[byte]string, error) {
+func SeperateArgs(argString string, validFlags ...interface{}) (map[byte]string, error) {
 	argMap := make(map[byte]string)
 
 	for _, flag := range validFlags {
@@ -23,5 +23,5 @@ func SeperateArgs(argString string, validFlags ...interface{}) (*map[byte]string
 		}
 	}
 
-	return &argMap, nil
+	return argMap, nil
 }
