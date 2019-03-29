@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 )
 
 var (
@@ -32,14 +31,10 @@ type tierSettings struct {
 	} `json:"max_settings"`
 }
 
-func loadTierSettings(tierPath string) (map[int]tierSettings, error) {
+func LoadTierSettings(tierJSON []byte) (map[int]tierSettings, error) {
 	var loadTier []tierSettings
-	loadBody, err := ioutil.ReadFile(tierPath)
-	if err != nil {
-		return nil, err
-	}
 
-	err = json.Unmarshal(loadBody, &loadTier)
+	err := json.Unmarshal(tierJSON, &loadTier)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ type Spell struct {
 
 //GetSpellByNameAndPlayer gets the first result spell of the player ID that matches the name specified
 func GetSpellByNameAndPlayer(name string, playerID string) (Spell, error) {
-	rows, err := db.Query("SELECT * FROM SpellTable WHERE PlayerID = ? AND SpellName = ?")
+	rows, err := db.Query("SELECT * FROM SpellTable WHERE PlayerID = $1 AND SpellName = $2")
 	if err != nil {
 		return Spell{}, err
 	}
@@ -62,7 +62,9 @@ func InsertNewSpell(spell Spell) error {
 	}
 	defer tx.Rollback()
 
-	err = tx.QueryRow("SELECT SpellID, SpellName, PlayerID FROM SpellTable WHERE PlayerID = \""+spell.PlayerID+"\" AND SpellName = \""+spell.Name+"\"").Scan(nil, nil, nil)
+	//Prepare the statement to hopefully avoid sql injection.
+	stmt1, err := tx.Prepare("SELECT SpellID, SpellName, PlayerID FROM SpellTable WHERE PlayerID = $1 AND SpellName = $2")
+	stmt1.QueryRow(spell.PlayerID, spell.Name).Scan(nil, nil, nil)
 	if err == nil {
 		return errors.New("spell already exists")
 	} else if err != sql.ErrNoRows {
@@ -82,7 +84,7 @@ func InsertNewSpell(spell Spell) error {
 		CoolDown,
 		PlayerID
 	)VALUES(
-		?,?,?,?,?,?,?,?,?,?,?
+		$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
 	)`)
 	if err != nil {
 		return err
@@ -119,17 +121,17 @@ func UpdateSpell(spell Spell) error {
 
 	stmt, err := tx.Prepare(`
 	UPDATE SpellTable
-		SET SpellName = ?,
-		SpellDesc = ?,
-		SpellElement = ?,
-		SpellType = ?,
-		SpellComplexity = ?,
-		Damage = ?,
-		ManaCost = ?,
-		Efficency = ?,
-		CastTime = ?,
-		CoolDown = ?,
-	WHERE SpellID = ?
+		SET SpellName = $1,
+		SpellDesc = $2,
+		SpellElement = $3,
+		SpellType = $4,
+		SpellComplexity = $5,
+		Damage = $6,
+		ManaCost = $7,
+		Efficency = $8,
+		CastTime = $9,
+		CoolDown = $10,
+	WHERE SpellID = $11
 	`)
 	if err != nil {
 		return err
@@ -158,7 +160,7 @@ func UpdateSpell(spell Spell) error {
 
 //RemoveSpellByNameAndPlayerID is used for testing and potentially for admin duties.
 func RemoveSpellByNameAndPlayerID(name string, playerID string) error {
-	stmt, err := db.Prepare("DELETE FROM SpellTable WHERE SpellName = ? AND PlayerID = ?")
+	stmt, err := db.Prepare("DELETE FROM SpellTable WHERE SpellName = $1 AND PlayerID = $2")
 	if err != nil {
 		return err
 	}

@@ -1,14 +1,19 @@
 package data
 
 import (
+	"io/ioutil"
 	"testing"
+
 	"github.com/soliel/SpellBot/config"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func TestInitDB(t *testing.T) {
+	configJSON, err := ioutil.ReadFile("../Configuration Files/SpellBotTest.json")
+	if err != nil {
+		t.Errorf("Test was unable to load configuration file.")
+	}
 
-	testingConfig, err := config.LoadConfig("../SpellBotTest.json") 
+	testingConfig, err := config.LoadConfig(configJSON)
 	if err != nil {
 		t.Errorf("Test not completed; config didn't load due to: %v", err)
 	}
@@ -24,21 +29,21 @@ func TestInitDB(t *testing.T) {
 		{
 			name: "Connection Test",
 			args: args{
-				loginString: CreateDatabaseString(*testingConfig) + "/SpellBot",
+				loginString: CreateDatabaseString(*testingConfig),
 			},
 			wantErr: false,
 		},
 		{
 			name: "Invalid Credential Test",
 			args: args{
-				loginString: "blah:testing@tcp(192.168.56.4:3306)/SpellBot",
+				loginString: "postgres://blah:testing@192.168.56.4:3306/SpellBot",
 			},
 			wantErr: true,
 		},
 		{
 			name: "Unable to connect test",
 			args: args{
-				loginString: "remote:testing@tcp(0.0.0.0:3306)/SpellBot",
+				loginString: "postgres://remote:testing@0.0.0.0:3306/SpellBot",
 			},
 			wantErr: true,
 		},
@@ -59,19 +64,21 @@ func TestCreateDBString(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want string	
+		want string
 	}{
 		{
 			name: "SpellBot Test",
 			args: args{
 				config: config.Config{
-					DatabaseIP: "127.0.0.1",
+					DatabaseIP:   "127.0.0.1",
 					DatabasePass: "testing",
 					DatabaseUser: "test",
 					DatabasePort: "3306",
+					DatabaseName: "testdb",
+					SSLMode:      "disable",
 				},
 			},
-			want: "test:testing@tcp(127.0.0.1:3306)",
+			want: "postgres://test:testing@127.0.0.1:3306/testdb?sslmode=disable",
 		},
 	}
 	for _, tt := range tests {

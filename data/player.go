@@ -1,6 +1,6 @@
 package data
 
-import(
+import (
 	"database/sql"
 )
 
@@ -21,7 +21,7 @@ type Player struct {
 
 //GetPlayerByID is used to return a Player struct from the database.
 func GetPlayerByID(playerID string) (Player, error) {
-	rows := db.QueryRow("SELECT * FROM PlayerTable WHERE PlayerID = ?", playerID)
+	rows := db.QueryRow("SELECT * FROM PlayerTable WHERE PlayerID = $1", playerID)
 	player := Player{}
 
 	err := rows.Scan(&player.PlayerID,
@@ -55,7 +55,7 @@ func InsertNewPlayer(playerID string) error {
 	defer tx.Rollback()
 
 	//oh look a comment
-	stmt, err := tx.Prepare("INSERT INTO PlayerTable(PlayerID) VALUES(?)")
+	stmt, err := tx.Prepare("INSERT INTO PlayerTable(PlayerID) VALUES($1)")
 	if err != nil {
 		return err
 	}
@@ -84,17 +84,17 @@ func UpdatePlayer(player Player) error {
 
 	stmt, err := tx.Prepare(`
 		UPDATE PlayerTable
-			SET MaximumMana = ?,
-			ManaRegen = ?,
-			SpellSkill = ?,
-			ChantingSkill = ?,
-			MainAffinity = ?,
-			SubAffinity = ?,
-			MainAffinityTier = ?,
-			SubAffinityTier = ?,
-			MageRank = ?,
-			Experience = ?
-		WHERE PlayerID = ?`)
+			SET MaximumMana = $1,
+			ManaRegen = $2,
+			SpellSkill = $3,
+			ChantingSkill = $4,
+			MainAffinity = $5,
+			SubAffinity = $6,
+			MainAffinityTier = $7,
+			SubAffinityTier = $8,
+			MageRank = $9,
+			Experience = $10,
+		WHERE PlayerID = $11`)
 	if err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func RemovePlayer(playerID string) error {
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.Prepare("DELETE FROM PlayerTable WHERE PlayerID = ?")
+	stmt, err := tx.Prepare("DELETE FROM PlayerTable WHERE PlayerID = $1")
 	if err != nil {
 		return err
 	}

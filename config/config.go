@@ -2,9 +2,9 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
 )
 
+//Config hold general configuration
 type Config struct {
 	BotToken     string `json:"bot_token"`
 	BotPrefix    string `json:"bot_prefix"`
@@ -12,16 +12,14 @@ type Config struct {
 	DatabaseUser string `json:"database_user"`
 	DatabasePass string `json:"database_password"`
 	DatabasePort string `json:"database_port"`
+	DatabaseName string `json:"database_name"`
+	SSLMode      string `json:"ssl_mode"`
 }
 
-func LoadConfig(filename string) (*Config, error) {
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-
+//LoadConfig loads the main config file for the application
+func LoadConfig(fileBytes []byte) (*Config, error) {
 	var confData Config
-	err = json.Unmarshal(body, &confData)
+	err := json.Unmarshal(fileBytes, &confData)
 	if err != nil {
 		return nil, err
 	}
