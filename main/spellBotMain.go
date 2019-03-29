@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/soliel/SpellBot/command"
-	"github.com/soliel/SpellBot/config"
-	"github.com/soliel/SpellBot/data"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/soliel/SpellBot/command"
+	"github.com/soliel/SpellBot/config"
+	"github.com/soliel/SpellBot/data"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -32,7 +33,7 @@ func main() {
 		return
 	}
 
-	err = data.InitDB(data.CreateDatabaseString(*conf) + "/SpellBot")
+	err = data.InitDB(data.CreateDatabaseString(*conf))
 	if err != nil {
 		log.Panic("Unable to connect to the database: ", err)
 	}

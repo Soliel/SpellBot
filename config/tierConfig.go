@@ -25,18 +25,19 @@ type tierSettings struct {
 	} `json:"base_settings"`
 	TierMaxSettings struct {
 		MaxDamage    int `json:"max_damage"`
-		MaxEfficency int `json:"max_Efficency"`
+		MaxEfficency int `json:"max_efficency"`
 		MinCasttime  int `json:"min_cast_time"`
-		MinCooldown  int `json:"min_cool_down"`
+		MinCooldown  int `json:"min_cooldown"`
 	} `json:"max_settings"`
 }
 
-func LoadTierSettings(tierJSON []byte) (map[int]tierSettings, error) {
+//LoadTierSettings helps load in our base values and variances. Max values are to be used to cap improvement.
+func LoadTierSettings(tierJSON []byte) error {
 	var loadTier []tierSettings
 
 	err := json.Unmarshal(tierJSON, &loadTier)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	tierMap := make(map[int]tierSettings)
@@ -46,7 +47,10 @@ func LoadTierSettings(tierJSON []byte) (map[int]tierSettings, error) {
 		}
 	}
 
-	return tierMap, nil
+	TierMap = tierMap
+	TierMax = getMaximumTier(TierMap)
+
+	return nil
 }
 
 func getMaximumTier(tierMap map[int]tierSettings) int {

@@ -11,6 +11,10 @@ var db *sql.DB
 
 //InitDB should be used with connection string in the format of user:password@tcp(127.0.0.1:3306)/hello
 func InitDB(loginString string) error {
+	if db != nil {
+		return nil
+	}
+
 	database, err := sql.Open("postgres", loginString)
 	if err != nil {
 		return err

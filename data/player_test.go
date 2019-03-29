@@ -9,7 +9,11 @@ import (
 )
 
 func TestGetPlayerByID(t *testing.T) {
-	InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	InsertNewPlayer("12345")
 
 	type args struct {
@@ -47,7 +51,7 @@ func TestGetPlayerByID(t *testing.T) {
 				playerID: "123456",
 			},
 			want:    Player{},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "Invalid player",
@@ -75,7 +79,11 @@ func TestGetPlayerByID(t *testing.T) {
 }
 
 func TestInsertNewPlayer(t *testing.T) {
-	InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	InsertNewPlayer("11111")
 
 	type args struct {
@@ -121,7 +129,11 @@ func TestInsertNewPlayer(t *testing.T) {
 }
 
 func TestUpdatePlayer(t *testing.T) {
-	InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	InsertNewPlayer("12345")
 
 	type args struct {
@@ -195,7 +207,7 @@ func TestUpdatePlayer(t *testing.T) {
 				MageRank:              0,
 				MageExperience:        0,
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

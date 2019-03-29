@@ -93,7 +93,7 @@ func UpdatePlayer(player Player) error {
 			MainAffinityTier = $7,
 			SubAffinityTier = $8,
 			MageRank = $9,
-			Experience = $10,
+			Experience = $10
 		WHERE PlayerID = $11`)
 	if err != nil {
 		return err

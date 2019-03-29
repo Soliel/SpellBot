@@ -6,6 +6,11 @@ import (
 )
 
 func TestGetSpellByNameAndPlayer(t *testing.T) {
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	type args struct {
 		name     string
 		playerID string
@@ -33,7 +38,13 @@ func TestGetSpellByNameAndPlayer(t *testing.T) {
 }
 
 func TestInsertNewSpell(t *testing.T) {
-	InitDB("remote:testing@tcp(192.168.56.4:3306)/SpellBot")
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	InsertNewPlayer("123")
+
 	InsertNewSpell(Spell{
 		SpellID:     0,
 		PlayerID:    "123",
@@ -62,7 +73,7 @@ func TestInsertNewSpell(t *testing.T) {
 			args: args{
 				spell: Spell{
 					SpellID:     0,     //SpellID will be set by the database
-					PlayerID:    "123", //123 is the test player. Discord ID's will always be 64bit so this won't collide.
+					PlayerID:    "123", //123 is the test player. discord ids are time based so it cannot collide.
 					Name:        "test spell",
 					Description: "A spell for testing.",
 					Element:     "Test",
@@ -106,11 +117,15 @@ func TestInsertNewSpell(t *testing.T) {
 		})
 	}
 
-	RemoveSpellByNameAndPlayerID("test spell", "123")
-	RemoveSpellByNameAndPlayerID("duplicate spell", "123")
+	RemovePlayer("123")
 }
 
 func TestUpdateSpell(t *testing.T) {
+	err := OpenTestDB()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	type args struct {
 		spell Spell
 	}
