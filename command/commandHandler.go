@@ -90,6 +90,8 @@ func (handler Handler) Register(name string, command commandFunc) error {
 func (handler Handler) HandleCommand(m *discordgo.MessageCreate, s *discordgo.Session, command CommandMessage) error {
 	cmdFunc, found := handler.commands[command.Command]
 	if !found {
+		fmt.Println("command not found")
+		fmt.Println(handler.commands)
 		return nil
 	}
 

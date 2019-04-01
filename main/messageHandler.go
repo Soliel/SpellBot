@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"github.com/soliel/SpellBot/command"
 	"github.com/bwmarrin/discordgo"
+	"github.com/soliel/SpellBot/command"
 	"strings"
 )
 
@@ -23,7 +22,6 @@ func filterMessages(s *discordgo.Session, m *discordgo.MessageCreate) command.Co
 	}
 
 	content := m.Content[len(conf.BotPrefix):]
-	fmt.Println(content)
 	if len(content) < 1 {
 		return commandMsg
 	}

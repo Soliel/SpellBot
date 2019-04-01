@@ -3,6 +3,10 @@ package data
 import (
 	"database/sql"
 	"errors"
+	"strconv"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/soliel/SpellBot/command"
 )
 
 //Spell will store spell data to use with the rest of the bot.
@@ -24,7 +28,7 @@ type Spell struct {
 
 //GetSpellByNameAndPlayer gets the first result spell of the player ID that matches the name specified
 func GetSpellByNameAndPlayer(name string, playerID string) (Spell, error) {
-	rows, err := db.Query("SELECT * FROM SpellTable WHERE PlayerID = $1 AND SpellName = $2")
+	rows, err := db.Query("SELECT * FROM SpellTable WHERE PlayerID = $1 AND SpellName = $2", playerID, name)
 	if err != nil {
 		return Spell{}, err
 	}
@@ -64,7 +68,7 @@ func InsertNewSpell(spell Spell) error {
 
 	//Prepare the statement to hopefully avoid sql injection.
 	stmt1, err := tx.Prepare("SELECT SpellID, SpellName, PlayerID FROM SpellTable WHERE PlayerID = $1 AND SpellName = $2")
-	stmt1.QueryRow(spell.PlayerID, spell.Name).Scan(nil, nil, nil)
+	err = stmt1.QueryRow(spell.PlayerID, spell.Name).Scan(nil, nil, nil)
 	if err == nil {
 		return errors.New("spell already exists")
 	} else if err != sql.ErrNoRows {
@@ -173,4 +177,30 @@ func RemoveSpellByNameAndPlayerID(name string, playerID string) error {
 	stmt.Close()
 
 	return nil
+}
+
+func (spell *Spell) CreateSpellEmbed(ctx command.Context) *discordgo.MessageEmbed {
+	if spell.Element == "" {
+		spell.Element = "None"
+	}
+
+	embed := &discordgo.MessageEmbed{
+		Title:       spell.Name,
+		Description: spell.Description,
+		Color:       14030101,
+		Author: &discordgo.MessageEmbedAuthor{
+			Name:    ctx.Author.Username,
+			IconURL: ctx.Author.AvatarURL(""),
+		},
+		Fields: []*discordgo.MessageEmbedField{
+			{"Spell Type", "Attack", true},
+			{"Damage", strconv.FormatInt(int64(spell.Damage), 10), true},
+			{"Element", spell.Element, true},
+			{"Mana Cost", strconv.FormatInt(int64(spell.ManaCost), 10), true},
+			{"Cast Time", strconv.FormatFloat(float64(spell.Casttime)/1000, 'f', 2, 64), true},
+			{"Cooldown", strconv.FormatFloat(float64(spell.Cooldown)/1000, 'f', 2, 64), true},
+		},
+	}
+
+	return embed
 }

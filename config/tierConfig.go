@@ -6,12 +6,12 @@ import (
 
 var (
 	//TierMap is the global map for the collection of settings, searchable by tier.
-	TierMap map[int]tierSettings
+	TierMap map[int]TierSettings
 	//TierMax explains itself.
 	TierMax int
 )
 
-type tierSettings struct {
+type TierSettings struct {
 	TierLevel        int `json:"tier"`
 	TierBaseSettings struct {
 		Damage            int `json:"base_damage"`
@@ -33,16 +33,16 @@ type tierSettings struct {
 
 //LoadTierSettings helps load in our base values and variances. Max values are to be used to cap improvement.
 func LoadTierSettings(tierJSON []byte) error {
-	var loadTier []tierSettings
+	var loadTier []TierSettings
 
 	err := json.Unmarshal(tierJSON, &loadTier)
 	if err != nil {
 		return err
 	}
 
-	tierMap := make(map[int]tierSettings)
+	tierMap := make(map[int]TierSettings)
 	for _, value := range loadTier {
-		if tierMap[value.TierLevel] != (tierSettings{}) {
+		if tierMap[value.TierLevel] == (TierSettings{}) {
 			tierMap[value.TierLevel] = value
 		}
 	}
@@ -53,7 +53,7 @@ func LoadTierSettings(tierJSON []byte) error {
 	return nil
 }
 
-func getMaximumTier(tierMap map[int]tierSettings) int {
+func getMaximumTier(tierMap map[int]TierSettings) int {
 	max := 0
 	for key := range tierMap {
 		if key > max {

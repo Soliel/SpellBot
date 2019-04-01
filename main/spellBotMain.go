@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/soliel/SpellBot/command"
 	"github.com/soliel/SpellBot/config"
 	"github.com/soliel/SpellBot/data"
-
-	"github.com/bwmarrin/discordgo"
+	"github.com/soliel/SpellBot/spellforge"
 )
 
 var (
@@ -20,12 +21,20 @@ var (
 )
 
 func main() {
-	config, err := config.LoadConfig("SpellBotConfig.json")
+	loadConfBytes, err := ioutil.ReadFile("../Configuration Files/SpellBotTest.json")
+	loadTierBytes, err := ioutil.ReadFile("../Configuration Files/TierTest.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	configuration, err := config.LoadConfig(loadConfBytes)
+	err = config.LoadTierSettings(loadTierBytes)
 	if err != nil {
 		fmt.Println("Error loading configuration, ", err)
 		return
 	}
-	conf = config
+	conf = configuration
 
 	dg, err := discordgo.New("Bot " + conf.BotToken)
 	if err != nil {
@@ -47,10 +56,7 @@ func main() {
 	}
 
 	handler = command.CreateHandler()
-
-	for i, guild := range dg.State.Guilds {
-		fmt.Print(guild.Name, ", ", guild.ID, ", ", i, "\n")
-	}
+	registerCommands()
 
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
@@ -61,11 +67,15 @@ func main() {
 }
 
 func onMessageRecieved(s *discordgo.Session, m *discordgo.MessageCreate) {
-	fmt.Printf("Msg: %v | Author: %v\n", m.Content, m.Author)
 	command := filterMessages(s, m)
 	if command.Command == "" {
 		return
 	}
 
 	handler.HandleCommand(m, s, command)
+}
+
+func registerCommands() {
+	handler.Register("createspell", spellforge.CreateSpellCommand)
+	handler.Register("cast", spellforge.CastSpell)
 }

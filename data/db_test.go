@@ -33,20 +33,6 @@ func TestInitDB(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			name: "Invalid Credential Test",
-			args: args{
-				loginString: "postgres://blah:testing@192.168.56.4:3306/SpellBot",
-			},
-			wantErr: true,
-		},
-		{
-			name: "Unable to connect test",
-			args: args{
-				loginString: "postgres://remote:testing@0.0.0.0:3306/SpellBot",
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
